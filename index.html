@@ -1,10 +1,93 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <title>Seoul Indoor Visualization</title>
+  <meta charset="UTF-8">
+  <title>Seoul Indoor Visualization</title>
+
+<!--
+  <script src="libs/jquery/jquery-3.2.1.min.js" ></script>
+-->
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
+
+
+
+  <link type="text/css"
+        href="libs/bootstrap/css/bootstrap.min.css" />
+  <link type="text/css"
+        href="libs/bootstrap/css/bootstrap-theme.min.css"/>
+  <script src="libs/bootstrap/js/bootstrap.min.js" ></script>
+
+
+  <link type="text/css"
+        href="libs/bootstrap-select/css/bootstrap-select.min.css"/>
+  <script src="libs/bootstrap-select/js/bootstrap-select.min.js"></script>
+  <script src="libs/bootstrap-select/js/i18n/defaults-en_US.min.js"></script>
+
+
+
+  <link type="text/css" href="./css/ol/ol.css"/>
+  <script src="js/ol/ol-debug.js" ></script>
+
+
+
+
 </head>
+<style>
+  html,
+  body{
+    width: 100%;
+    height: 100%;
+    padding : 0;
+    margin : 0;
+    font-size:10px;
+    overflow:hidden;
+  }
+  #map{
+    width: 100%;
+  }
+  #seoulList{
+    position : absolute;
+    left:20px;
+    top:20px;
+    z-index : 3;
+  }
+
+</style>
 <body>
+  <div id="seoulList" class="col-sm-12 col-md-12">
+    <select class="selectpicker" id="search"
+            data-width="100%" data-live-search="true">
+
+    </select>
+  </div>
+
+  <div id="map">
+  </div>
 
 </body>
+<script>
+  var center =
+    ol.proj.transform(
+      [127.010031, 37.582200],
+      'EPSG:4326', 'EPSG:3857');
+  var layers = [
+    new ol.layer.Tile({
+      source : new ol.source.OSM()
+    })
+  ];
+  var view = new ol.View({
+    center : center,
+    zoom : 12
+  });
+  var map = new ol.Map({
+    target : 'map',
+    layers : layers,
+    view : view
+  });
+  $('.selectpicker').selectpicker({
+    style: 'btn-info',
+    size: 4
+  });
+
+</script>
 </html>
