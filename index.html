@@ -13,7 +13,9 @@
 
   <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.12.4/js/bootstrap-select.min.js"></script>
+
 -->
+  <link rel="stylesheet" href="//netdna.bootstrapcdn.com/font-awesome/4.0.0/css/font-awesome.css"/>
   <link rel="stylesheet" href="libs/bootstrap/css/bootstrap.min.css" />
   <link rel="stylesheet" href="libs/bootstrap/css/bootstrap-theme.min.css"/>
   <script src="libs/bootstrap/js/bootstrap.min.js" ></script>
@@ -37,7 +39,7 @@
     height: 100%;
     padding : 0;
     margin : 0;
-    font-size:10px;
+    /*font-size:10px;*/
     overflow:hidden;
   }
   #map{
@@ -49,14 +51,96 @@
     top:20px;
     z-index : 3;
   }
+  #floorList{
+    position: absolute;
+    bottom:20px;
+    right:20px;
+    z-index: 3;
+  }
 </style>
 <body>
+<!--
   <div id="seoulList" class="col-sm-12 col-md-12">
     <select class="selectpicker" id="search"
-            data-width="20%" data-live-search="true">
+      data-width="25%" data-live-search="true"
+      title="Choose one of the following...">
     </select>
   </div>
   <div id="map">  </div>
+
+  <div id="floorList" style="display:none;"> </div>
+
+-->
+
+  <!--<div class="container">-->
+  <div class="navbar navbar-default" role="navigation">
+    <div class="container-fluid navbar-border">
+      <div class="navbar-header">
+        <button type="button" class="navbar-toggle" data-toggle="collapse"
+                data-target="#bs-navbar-collapse-1">
+          <span class="sr-only">Toggle navigation</span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+        <a class="navbar-brand" href="#"><i class="fa fa-home"></i>
+          Seoul Indoor in Korea</a>
+      </div>
+
+
+      <div class="collapse navbar-collapse" id="bs-navbar-collapse-1">
+        <ul class="nav navbar-nav">
+          <li>
+            <form class="navbar-form" role="search">
+              <div class="input-group">
+                <input type="text" class="form-control" placeholder="search" name="q">
+                <div class="input-group-btn">
+                  <button class="btn btn-default" type="submit">
+                    <i class="fa fa-search"></i>
+                  </button>
+                </div>
+              </div>
+            </form>
+          </li>
+        </ul>
+
+        <ul class="nav navbar-nav navbar-right">
+          <li class="dropdown">
+            <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+              <i class="fa fa-cogs"></i>
+              <b class="color-blue">Object Info.</b>
+              <span class="caret"></span>
+            </a>
+            <ul class="dropdown-menu login-panel">
+              <li>
+                <div class="dropdown-header">
+                  <span class="login-header color-blue">Index List</span>
+                </div>
+                <div class="clearfix"></div>
+                <div style="padding: 8px">
+                  aaa
+                </div>
+                <div class="dropdown-header">
+                  <span class="login-header color-blue">Index Object</span>
+                </div>
+                <div style="padding: 8px">
+                  bbb
+                </div>
+              </li>
+            </ul>
+          </li>
+        </ul>
+      </div>
+
+
+    </div>
+
+
+  </div>
+
+
+  <!--</div>-->
+
 
   <div class="container">
     <div class="row">
@@ -73,7 +157,12 @@
       </div>
     </div>
   </div>
+
 </body>
+<script src="js/main.js"></script>
+<script src="js/util.js"></script>
+<link rel="stylesheet" href="css/loading.css" />
+<link rel="stylesheet" href="css/navbar.css" />
 <script>
   var center =
     ol.proj.transform(
@@ -97,7 +186,13 @@
     layers : layers,
     view : view
   });
+  requestBuildingList();
+  $('#search').on('change', function(evt){
+    var json = JSON.parse($(this).val());
+    var center = ol.proj.fromLonLat([json.lon, json.lat]);
+    map.getView().setZoom(17);
+    map.getView().setCenter(center);
+    requestBuildingData(true, json.bldId);
+  });
 </script>
-<script src="js/main.js"></script>
-<link rel="stylesheet" href="css/loading.css" />
 </html>
