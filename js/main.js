@@ -54,6 +54,7 @@ function requestBuildingData(sw, bldId, floorIdx, callback){
           callback(result);
         }
       } catch(e){
+        console.log(e);
         console.log(evt.result);
       }
     }
@@ -71,11 +72,12 @@ function requestFloorData(bldId, callback){
     success : function (evt){
       loading(false);
       try{
-        var result = JSON.parse(evt.result);
+        var result = evt.result;
         if (callback != null){
           callback(result);
         }
       } catch(e){
+        console.log(e);
         console.log(evt.result);
       }
     }

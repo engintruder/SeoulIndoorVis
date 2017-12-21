@@ -2,18 +2,15 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, user-scalable=no">
   <title>Seoul Indoor Visualization</title>
   <script src="libs/jquery/jquery-3.2.1.min.js" ></script>
-  <!--<script src="libs/spin/spin.js"></script>-->
 <!--
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
-
   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.12.4/css/bootstrap-select.min.css">
-
   <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.12.4/js/bootstrap-select.min.js"></script>
-
 -->
   <link rel="stylesheet" href="//netdna.bootstrapcdn.com/font-awesome/4.0.0/css/font-awesome.css"/>
   <link rel="stylesheet" href="libs/bootstrap/css/bootstrap.min.css" />
@@ -58,33 +55,8 @@
     border-bottom-left-radius:0.5em;
     -moz-border-radius-bottomleft:0.5em;
    }
-  /*
-  #seoulList{
-    position : absolute;
-    left:20px;
-    top:20px;
-    z-index : 3;
-  }
-  #floorList{
-    position: absolute;
-    bottom:20px;
-    right:20px;
-    z-index: 3;
-  }*/
 </style>
 <body>
-<!--
-  <div id="seoulList" class="col-sm-12 col-md-12">
-    <select class="selectpicker" id="search"
-      data-width="25%" data-live-search="true"
-      title="Choose one of the following...">
-    </select>
-  </div>
-  <div id="map">  </div>
-  <div id="floorList" style="display:none;"> </div>
--->
-
-  <!--<div class="container">-->
   <div class="navbar navbar-default" role="navigation" style="margin-bottom:0px;">
     <div class="container-fluid navbar-border">
       <div class="navbar-header">
@@ -144,9 +116,53 @@
                 <div class="dropdown-header">
                   <span class="login-header color-blue">Index Object</span>
                 </div>
-                <div style="padding: 8px">
-                  bbb
-                </div>
+                <ul class="list-group">
+<!--              <li id="floorObj">
+                    None
+                  </li>-->
+                  <li class="list-group-item floor-objects" style="background-color:rgba(108, 108, 108, 0.8); display:none;">
+                    WALL
+                    <div class="material-switch pull-right">
+                      <input id="wallChk" name="floorObject" type="checkbox"/>
+                      <label for="wallChk" class="label-default"></label>
+                    </div>
+                  </li>
+                  <li class="list-group-item floor-objects" style="background-color:rgba(255, 255, 255, 0.8); display:none;">
+                    SPACE
+                    <div class="material-switch pull-right">
+                      <input id="spaceChk" name="floorObject" type="checkbox"/>
+                      <label for="spaceChk" class="label-default"></label>
+                    </div>
+                  </li>
+                  <li class="list-group-item floor-objects" style="background-color:rgba(76, 198, 67, 0.8); display:none;">
+                    COLUMN
+                    <div class="material-switch pull-right">
+                      <input id="columnChk" name="floorObject" type="checkbox"/>
+                      <label for="columnChk" class="label-default"></label>
+                    </div>
+                  </li>
+                  <li class="list-group-item floor-objects" style="background-color:rgba(255, 99, 71, 0.8); display:none;">
+                    DOOR
+                    <div class="material-switch pull-right">
+                      <input id="doorChk" name="floorObject" type="checkbox"/>
+                      <label for="doorChk" class="label-default"></label>
+                    </div>
+                  </li>
+                  <li class="list-group-item floor-objects" style="background-color:rgba(0, 128, 128, 0.8); display:none;">
+                    STAIR
+                    <div class="material-switch pull-right">
+                      <input id="stairChk" name="floorObject" type="checkbox"/>
+                      <label for="stairChk" class="label-default"></label>
+                    </div>
+                  </li>
+                  <li class="list-group-item floor-objects" style="background-color:rgba(245, 222, 179, 0.8); display:none;">
+                    WINDOWS
+                    <div class="material-switch pull-right">
+                      <input id="windowChk" name="floorObject" type="checkbox"/>
+                      <label for="windowChk" class="label-default"></label>
+                    </div>
+                  </li>
+                </ul>
               </li>
             </ul>
           </li>
@@ -164,23 +180,13 @@
     </div>    <!-- container navbar -->
   </div>      <!-- navigation navbar -->
 
-  <div class="">
-    <div id="map"> </div>
-  </div>
+  <div class="">  <div id="map"> </div>   </div>
 
-  <!--</div>-->
   <div class="container">
     <div class="row">
       <div id="loader" style="display:none;">
-        <div class="dot"></div>
-        <div class="dot"></div>
-        <div class="dot"></div>
-        <div class="dot"></div>
-        <div class="dot"></div>
-        <div class="dot"></div>
-        <div class="dot"></div>
-        <div class="dot"></div>
-        <div class="lading"></div>
+        <div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div>
+        <div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="lading"></div>
       </div>
     </div>
   </div>
@@ -246,30 +252,77 @@
       map.getView().setZoom(17);
       map.getView().setCenter(center);
 
-      requestFloorData(data.bldId, function(floorInfo){
-        console.log(floorInfo);
+      requestFloorData(data['bldId'], function(floorInfo){
         var radio = $('#layerRadio');
         radio.empty();
         for(key in floorInfo){
-          console.log("TTT");
           radio.append(
             '<div class="funkyradio-success">'
-            + '<input type="radio" name="floorInfo" data-name=""'
+            + '<input type="radio" name="floorInfo" data-name="'+ floorInfo[key] + '"'
+            + ' data-idx='+ key
+            + ' data-json='+ JSON.stringify(data)
             + ' id="radio-' + key + '">'
             +'<label for="radio-' + key + '">' + floorInfo[key]  + '</label>'
             +'</div>'
           )
         }
       });
-
-
-      /*
-      requestBuildingData(true, data.bldId, 0, function(obj){
-        $('#curName').html(data['bldName']);
-        console.log(obj);
-      });
-      */
     });
+
+    //Change Index Radio
+  $(document).on('change', 'input[name=floorInfo]:radio', function(evt){
+    var json = $(this).data('json');
+    var idx = $(this).data('idx');
+    var name = $(this).data('name');
+    requestBuildingData(true, json['bldId'], idx, function(objs){
+      $('#curName').html(json['bldName']);
+      $('.floor-objects').css('display','none');
+      for (var i=0; i<objs.length; i++){
+        var obj = objs[i];
+        for(objKey in objs[i]){
+          if (objKey =='Facility' || objKey =='GuideLine'){
+            continue;
+          }
+          var geojson = (new ol.format.GeoJSON({
+            defaultDataProjection: ol.proj.get('EPSG:5179'),
+            featureProjection : ol.proj.get('EPSG:3857')
+          }))
+            .readFeatures(JSON.parse(objs[i][objKey]), {
+              defaultDataProjection : ol.proj.get('EPSG:5179'),
+              featureProjection : ol.proj.get('EPSG:3857')
+            });
+          var style = new ol.style.Style({
+            stroke : new ol.style.Stroke({
+              color : selectColor(objKey, 'stroke'),
+              width : 1.5
+            }),
+            fill : new ol.style.Fill({
+              color : selectColor(objKey, 'fill')
+            })
+          });
+          var geojsonSource = new ol.source.Vector({
+            features : geojson
+          });
+          var vectorLayer = new ol.layer.Vector({
+            source : geojsonSource,
+            style : style
+          });
+          map.addLayer(vectorLayer);
+          var chks = $('.floor-objects');
+          for(var j=0; j<chks.length; j++){
+            var chkText = $(chks[j]).text().trim();
+            if (objKey.toUpperCase() == chkText){
+              $(chks[j]).css('display', '');
+            }
+
+          }
+
+
+        }
+      }
+
+    });
+  });
   });
 </script>
 <script src="./js/main.js"></script>
