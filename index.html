@@ -45,6 +45,20 @@
   #map{
     width: 100%;
   }
+  #dataList{
+    height:400px;
+    overflow-y:auto;
+    min-width: 250px;
+    border-top: 14px solid #0080c5;
+    border-right: 1px solid #0080c5;
+    border-bottom-right-radius:0.5em;
+    -moz-border-radius-bottomright:0.5em;
+    border-bottom: 3px solid #0080c5;
+    border-left: 1px solid #0080c5;
+    border-bottom-left-radius:0.5em;
+    -moz-border-radius-bottomleft:0.5em;
+   }
+  /*
   #seoulList{
     position : absolute;
     left:20px;
@@ -56,7 +70,7 @@
     bottom:20px;
     right:20px;
     z-index: 3;
-  }
+  }*/
 </style>
 <body>
 <!--
@@ -67,13 +81,11 @@
     </select>
   </div>
   <div id="map">  </div>
-
   <div id="floorList" style="display:none;"> </div>
-
 -->
 
   <!--<div class="container">-->
-  <div class="navbar navbar-default" role="navigation">
+  <div class="navbar navbar-default" role="navigation" style="margin-bottom:0px;">
     <div class="container-fluid navbar-border">
       <div class="navbar-header">
         <button type="button" class="navbar-toggle" data-toggle="collapse"
@@ -93,16 +105,22 @@
           <li>
             <form class="navbar-form" role="search">
               <div class="input-group">
-                <input type="text" class="form-control" placeholder="search" name="q">
                 <div class="input-group-btn">
                   <button class="btn btn-default" type="submit">
                     <i class="fa fa-search"></i>
                   </button>
                 </div>
+                <input id="dataSearch"
+                    type="text" class="form-control" placeholder="search" name="q">
               </div>
             </form>
           </li>
-        </ul>
+          <li><a href="#">
+            <!--<i class="fa fa-phone"></i>-->
+            Current Object: <span id="curName">None</span>
+            </a>
+          </li>
+        </ul> <!-- left navbar -->
 
         <ul class="nav navbar-nav navbar-right">
           <li class="dropdown">
@@ -118,7 +136,10 @@
                 </div>
                 <div class="clearfix"></div>
                 <div style="padding: 8px">
-                  aaa
+                  <div id="layerRadio" class="funkyradio"
+                       style="height:100px; overflow-y:scroll">
+
+                  </div>
                 </div>
                 <div class="dropdown-header">
                   <span class="login-header color-blue">Index Object</span>
@@ -129,19 +150,25 @@
               </li>
             </ul>
           </li>
-        </ul>
-      </div>
+          <li class="dropdown" id="dataListMenu">
+            <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+              <i class="fa fa-building"></i>
+              <b class="color-blue">List </b>
+              <span class="caret"></span>
+            </a>
+            <ul class="dropdown-menu" role="menu" id="dataList">
+            </ul>
+          </li>
+        </ul> <!-- right navbar -->
+      </div>  <!-- content navbar -->
+    </div>    <!-- container navbar -->
+  </div>      <!-- navigation navbar -->
 
-
-    </div>
-
-
+  <div class="">
+    <div id="map"> </div>
   </div>
 
-
   <!--</div>-->
-
-
   <div class="container">
     <div class="row">
       <div id="loader" style="display:none;">
@@ -159,40 +186,94 @@
   </div>
 
 </body>
-<script src="js/main.js"></script>
+<script>
+  $(function(){
+    var center =
+      ol.proj.transform(
+        [127.010031, 37.582200],
+        'EPSG:4326', 'EPSG:3857');
+    var layers = [
+      new ol.layer.Tile({
+        source : new ol.source.OSM()
+      })
+    ];
+    proj4.defs("EPSG:5179", "+proj=tmerc +lat_0=38 +lon_0=127.5 +k=0.9996 +x_0=1000000 +y_0=2000000 +ellps=GRS80 +units=m +no_defs");
+    var proj_5179 = new ol.proj.Projection({
+      code : "EPSG:5179"
+    });
+    var view = new ol.View({
+      center : center,
+      zoom : 12
+    });
+    var map = new ol.Map({
+      target : 'map',
+      layers : layers,
+      view : view
+    });
+
+    //Request Data Name
+    requestBuildingList();
+
+    //Search
+    $('#dataSearch').keyup(function(evt){
+      var val = $(this).val();
+      var menu =$('#dataListMenu');
+      var listRoot = $('#dataList');
+      var listContent = listRoot.children('li');
+      if (val ==''){
+        menu.removeClass('open');
+        for(var i=0; i<listContent.length; i++){
+          $(listContent[i]).css('display', '');
+        }
+        return 0;
+      }
+      menu.addClass('open');
+
+      for(var i=0; i<listContent.length; i++){
+        var content = $(listContent[i]).children('a')[0];
+        if (content.innerHTML.toUpperCase().indexOf(val) > -1) {
+          $(listContent[i]).css('display', '');
+        } else {
+          $(listContent[i]).css('display', 'none');
+        }
+      }
+    });
+
+    //Request Object
+    $(document).on('click', '.list-evt', function(evt){
+      var data = $(this).data('val');
+      var center = ol.proj.fromLonLat([ data['lon'], data['lat'] ]);
+      map.getView().setZoom(17);
+      map.getView().setCenter(center);
+
+      requestFloorData(data.bldId, function(floorInfo){
+        console.log(floorInfo);
+        var radio = $('#layerRadio');
+        radio.empty();
+        for(key in floorInfo){
+          console.log("TTT");
+          radio.append(
+            '<div class="funkyradio-success">'
+            + '<input type="radio" name="floorInfo" data-name=""'
+            + ' id="radio-' + key + '">'
+            +'<label for="radio-' + key + '">' + floorInfo[key]  + '</label>'
+            +'</div>'
+          )
+        }
+      });
+
+
+      /*
+      requestBuildingData(true, data.bldId, 0, function(obj){
+        $('#curName').html(data['bldName']);
+        console.log(obj);
+      });
+      */
+    });
+  });
+</script>
+<script src="./js/main.js"></script>
 <script src="js/util.js"></script>
 <link rel="stylesheet" href="css/loading.css" />
 <link rel="stylesheet" href="css/navbar.css" />
-<script>
-  var center =
-    ol.proj.transform(
-      [127.010031, 37.582200],
-      'EPSG:4326', 'EPSG:3857');
-  var layers = [
-    new ol.layer.Tile({
-      source : new ol.source.OSM()
-    })
-  ];
-  proj4.defs("EPSG:5179", "+proj=tmerc +lat_0=38 +lon_0=127.5 +k=0.9996 +x_0=1000000 +y_0=2000000 +ellps=GRS80 +units=m +no_defs");
-  var proj_5179 = new ol.proj.Projection({
-    code : "EPSG:5179"
-  });
-  var view = new ol.View({
-    center : center,
-    zoom : 12
-  });
-  var map = new ol.Map({
-    target : 'map',
-    layers : layers,
-    view : view
-  });
-  requestBuildingList();
-  $('#search').on('change', function(evt){
-    var json = JSON.parse($(this).val());
-    var center = ol.proj.fromLonLat([json.lon, json.lat]);
-    map.getView().setZoom(17);
-    map.getView().setCenter(center);
-    requestBuildingData(true, json.bldId);
-  });
-</script>
 </html>

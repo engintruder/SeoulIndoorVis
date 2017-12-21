@@ -9,6 +9,18 @@ function requestBuildingList(callback){
     url : baseURL + '/indoor2dmap/buildingList.json?key=03c88b3566c5431fa45f691425a8a8df',
     success : function (data){
       var result = data.result;
+      var div = $('#dataList');
+      div.empty();
+      for(var i=0; i<result.length; i++){
+        div.append(
+          '<li><a href="#" class="list-evt" ' +
+          'data-val=' + JSON.stringify((result[i])) + '>'
+          + result[i]['bldName']
+          +'</a></li>'
+        );
+
+      }
+/*
       $('#search').empty();
       for(var i=0; i<result.length; i++){
         $('#search').append('<option data-tokens="' + result[i]['bldName'] + '"'+
@@ -16,7 +28,7 @@ function requestBuildingList(callback){
           result[i]['bldName'] + '</option>');
       }
       $('#search').selectpicker('refresh');
-
+*/
       if (callback != null){
         callback(result);
       }
@@ -26,10 +38,11 @@ function requestBuildingList(callback){
   });
 }
 //Request Building Data
-function requestBuildingData(sw, bldId){
+function requestBuildingData(sw, bldId, floorIdx, callback){
+  callback = (typeof(callback) !== 'undefined') ? callback : null;
   var url = baseURL + '/indoor2dmap/layerInfo.json?key=03c88b3566c5431fa45f691425a8a8df'
-            +'&bldId='+ bldId;
-            //+ '&floorIdx=5';
+            +'&bldId='+ bldId
+            + '&floorIdx=' + floorIdx;
   loading(true);
   $.ajax({
     url : url,
@@ -37,10 +50,36 @@ function requestBuildingData(sw, bldId){
       loading(false);
       try{
         var result = JSON.parse(evt.result);
+        if (callback != null){
+          callback(result);
+        }
       } catch(e){
-        console.err(evt.result);
+        console.log(evt.result);
       }
     }
   })
 }
+
+//Request Building FloorList Data
+function requestFloorData(bldId, callback){
+  callback = (typeof(callback) !== 'undefined') ? callback : null;
+  var url = baseURL + '/indoor2dmap/floorList.json?key=03c88b3566c5431fa45f691425a8a8df'
+    +'&bldId='+ bldId;
+  loading(true);
+  $.ajax({
+    url : url,
+    success : function (evt){
+      loading(false);
+      try{
+        var result = JSON.parse(evt.result);
+        if (callback != null){
+          callback(result);
+        }
+      } catch(e){
+        console.log(evt.result);
+      }
+    }
+  })
+}
+
 
