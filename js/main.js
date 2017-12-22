@@ -85,3 +85,23 @@ function requestFloorData(bldId, callback){
 }
 
 
+//Request handicap Data
+function requestHandicapData(bldId, floorIdx, callback){
+  callback = (typeof(callback) !== 'undefined') ? callback : null;
+  var url = baseURL + '/handicapFacility/facilityList.json?key=03c88b3566c5431fa45f691425a8a8df'
+    + '&bldId=' + bldId
+    + '&floorIdx=' + floorIdx;
+  loading(true);
+  $.ajax({
+    url : url,
+    success : function (evt){
+      loading(false);
+      try{
+        var result = evt.result;
+        console.log(result);
+      } catch(e){
+        console.log(e);
+      }
+    }
+  });
+}

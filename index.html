@@ -12,7 +12,7 @@
   <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.12.4/js/bootstrap-select.min.js"></script>
 -->
-  <link rel="stylesheet" href="//netdna.bootstrapcdn.com/font-awesome/4.0.0/css/font-awesome.css"/>
+  <!--<link rel="stylesheet" href="//netdna.bootstrapcdn.com/font-awesome/4.6.0/css/font-awesome.css"/>-->
   <link rel="stylesheet" href="libs/bootstrap/css/bootstrap.min.css" />
   <link rel="stylesheet" href="libs/bootstrap/css/bootstrap-theme.min.css"/>
   <script src="libs/bootstrap/js/bootstrap.min.js" ></script>
@@ -26,7 +26,7 @@
   <link rel="stylesheet" href="libs/ol3/css/ol.css"/>
   <script src="libs/ol3/js/ol-debug.js" ></script>
   <script src="libs/ol3/js/proj4.js"></script>
-
+  <script src="https://use.fontawesome.com/9411c5f9e1.js"></script>
 
 </head>
 <style>
@@ -40,7 +40,9 @@
     overflow:hidden;
   }
   #map{
+    position:relative;
     width: 100%;
+    z-index:1;
   }
   #dataList{
     height:400px;
@@ -55,6 +57,17 @@
     border-bottom-left-radius:0.5em;
     -moz-border-radius-bottomleft:0.5em;
    }
+  .ol-zoom{
+    left:unset;
+    right:8px;
+  }
+  .custom-btn{
+    background-color: rgba(0, 202, 92, 1);
+  }
+  .custom-size{
+    font-size:1.5em;
+    margin-right:10px;
+  }
 </style>
 <body>
   <div class="navbar navbar-default" role="navigation" style="margin-bottom:0px;">
@@ -117,9 +130,6 @@
                   <span class="login-header color-blue">Index Object</span>
                 </div>
                 <ul class="list-group">
-<!--              <li id="floorObj">
-                    None
-                  </li>-->
                   <li class="list-group-item floor-objects" style="background-color:rgba(108, 108, 108, 0.8); display:none;">
                     WALL
                     <div class="material-switch pull-right">
@@ -180,7 +190,44 @@
     </div>    <!-- container navbar -->
   </div>      <!-- navigation navbar -->
 
-  <div class="">  <div id="map"> </div>   </div>
+  <div class="">
+    <div id="map">
+      <div style="position:absolute; top:20px; left:0px; z-index:2;">
+
+        <ul class="list-group">
+          <li class="list-group-item custom-btn">
+            <i class="fa fa-wheelchair custom-size" aria-hidden="true"></i>
+            <div class="material-switch pull-right">
+              <input id="handiChk" name="linkerContent" type="checkbox"/>
+              <label for="handiChk" class="label-default"></label>
+            </div>
+          </li>
+          <li class="list-group-item custom-btn">
+            <i class="fa fa-sign-in custom-size" aria-hidden="true"></i>
+            <div class="material-switch pull-right">
+              <input id="enterChk" name="linkerContent" type="checkbox"/>
+              <label for="enterChk" class="label-default"></label>
+            </div>
+          </li>
+          <li class="list-group-item custom-btn">
+            <i class="fa fa-shopping-cart custom-size" aria-hidden="true"></i>
+            <div class="material-switch pull-right">
+              <input id="shoppingChk" name="linkerContent" type="checkbox"/>
+              <label for="shoppingChk" class="label-default"></label>
+            </div>
+          </li>
+          <li class="list-group-item custom-btn">
+            <i class="fa fa-blind custom-size" aria-hidden="true"></i>
+            <div class="material-switch pull-right">
+              <input id="routerChk" name="linkerContent" type="checkbox"/>
+              <label for="routerChk" class="label-default"></label>
+            </div>
+          </li>
+        </ul>
+
+      </div>
+    </div>
+  </div>
 
   <div class="container">
     <div class="row">
