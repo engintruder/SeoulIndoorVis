@@ -1,7 +1,7 @@
 //http://113.198.80.59/app/openapi/seoulcity/indoor2dmap/layerInfo.json?key=03c88b3566c5431fa45f691425a8a8df&bldId=514&floorIdx=5
 var baseURL = 'http://113.198.80.59/app/openapi/seoulcity';
 var objsName = ["Wall", "Space", "Column", "Door", "Stair", "Window", "Elevator", "Escalator"];
-
+var apiKey = '03c88b3566c5431fa45f691425a8a8df';
 //Request Building List
 function requestBuildingList(callback){
   callback = (typeof(callback) !== 'undefined') ? callback : null;
@@ -85,12 +85,20 @@ function requestFloorData(bldId, callback){
 }
 
 
-//Request handicap Data
-function requestHandicapData(bldId, floorIdx, callback){
+//Request nearby Info
+function requestLinkerContentList(type, bldId, callback){
   callback = (typeof(callback) !== 'undefined') ? callback : null;
-  var url = baseURL + '/handicapFacility/facilityList.json?key=03c88b3566c5431fa45f691425a8a8df'
-    + '&bldId=' + bldId
-    + '&floorIdx=' + floorIdx;
+  var url = baseURL;
+  if (type == 'nearby'){
+    url = url + '/nearby/nearbyInfo.json';
+  } else if (type == 'handi'){
+    url = url + '/handicapFacility/facilityList.json';
+  } else if (type == 'enter'){
+    url = url + '/entrance/entranceList.json';
+  } else if (type == 'shopping'){
+    url = url + '/shoppingCenter/shoppingCenterList.json';
+  }
+  url = url + '?key=03c88b3566c5431fa45f691425a8a8df' + '&bldId=' + bldId;
   loading(true);
   $.ajax({
     url : url,
@@ -98,9 +106,12 @@ function requestHandicapData(bldId, floorIdx, callback){
       loading(false);
       try{
         var result = evt.result;
-        console.log(result);
+        if (callback != null){
+          callback(result);
+        }
       } catch(e){
         console.log(e);
+        console.log(evt.result);
       }
     }
   });

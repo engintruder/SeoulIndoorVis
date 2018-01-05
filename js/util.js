@@ -1,3 +1,41 @@
+function resizeContent(options){
+  var header = document.getElementsByTagName("header")
+  var footer = document.getElementsByTagName("footer");
+  var aside = document.getElementsByTagName("aside");
+  options = (typeof(options) !== 'undefined') ? options : {
+    section : document.getElementsByTagName("section"),
+    headerHeight : (header.length !== 0) ? parseInt((getComputedStyle(header[0]).height).replace(/[^-\d\.]/g,'')) : 0,
+    footerHeight : (footer.length !== 0) ? parseInt((getComputedStyle(footer[0]).height).replace(/[^-\d\.]/g,'')) : 0,
+    asideWidth :   (aside.length !== 0) ? parseInt((getComputedStyle(aside[0]).width).replace(/[^-\d\.]/g,'')) : 0
+  };
+  var frameWidth = window.innerWidth, frameHeight = window.innerHeight;
+  for(var i=0; i<options.section.length; i++){
+    options.section[i].style.width = (frameWidth - options.asideWidth) + 'px';
+    options.section[i].style.height = (frameHeight - (options.headerHeight + options.footerHeight)) + 'px';
+  }
+
+}
+function getLayer(map, title){
+  var array = map.getLayers().getArray();
+  for(var i=0; i<array.length; i++){
+    if (array[i].get('title') == title){
+      return array[i];
+    }
+  }
+  return null;
+}
+function removeLayers(map, likeString){
+  var array = map.getLayers().getArray();
+  var catchArr = new Array();
+  for(var i=0; i<array.length; i++){
+    if (array[i].get('title').indexOf(likeString) != -1){
+      catchArr.push(array[i]);
+    }
+  }
+  for (var i=0; i<catchArr.length; i++){
+    map.removeLayer(catchArr[i]);
+  }
+}
 function loading(sw){
   if (sw ==true){
     $('#loader').css('display','block');
@@ -25,4 +63,62 @@ function selectColor(obj, type){
     (type == 'stroke'? result ="#ff80ff" : result = "rgba(255, 128, 255, 0.8)");
   }
   return result;
+}
+function setIndex(objKey, layer){
+  if (objKey == 'Space'){
+    layer.setZIndex(3);
+  } else if (objKey == 'Wall'){
+    layer.setZIndex(4);
+  } else if (objKey == 'Column'){
+    layer.setZIndex(5);
+  } else if (objKey == 'Window'){
+    layer.setZIndex(6);
+  } else if (objKey == 'Stair'){
+    layer.setZIndex(7);
+  } else if (objKey == 'Door'){
+    layer.setZIndex(8);
+  } else if (objKey == 'Escalator'){
+    layer.setZIndex(9);
+  } else {
+    layer.setZIndex(9);
+  }
+}
+function addPOIs(map, title, data){
+  var array = new Array();
+  for(var i=0; i<data.length; i++){
+    var obj = data[i];
+    var coordinates = ol.proj.fromLonLat([obj.lon, obj.lat]);
+    var feature = new ol.Feature({
+      geometry : new ol.geom.Point(coordinates)
+    });
+    //iconStyle
+    var icon = new ol.style.Style({
+      image : new ol.style.Icon({
+        src: './images/'+ title + '.png'
+      })
+    });
+    feature.setStyle(icon);
+    feature.set('info', JSON.stringify(obj));
+    array.push(feature);
+  }
+  var source = new ol.source.Vector({
+    features : array
+  });
+  var layer = new ol.layer.Vector({
+    title : title,
+    source : source
+  });
+  layer.setZIndex(10);
+  map.addLayer(layer);
+}
+
+function removePOIs(map, title){
+  var array = map.getLayers().getArray();
+  for(var i=0; i<array.length; i++){
+    if (array[i].get('title') == title){
+      map.removeLayer(array[i]);
+      return true;
+    }
+  }
+  return false;
 }
