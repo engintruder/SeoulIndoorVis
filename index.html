@@ -28,6 +28,11 @@
 
   <script src="https://use.fontawesome.com/9411c5f9e1.js"></script>
 
+  <script src="./js/main.js"></script>
+  <script src="js/util.js"></script>
+  <link rel="stylesheet" href="css/main.css" />
+  <link rel="stylesheet" href="css/loading.css" />
+  <link rel="stylesheet" href="css/navbar.css" />
 </head>
 <style>
   html,
@@ -249,6 +254,143 @@
     </div>
   </div>
 
+  <div id="popup" class="ol-popup">
+    <!--<a href="#" id="popup-closer" class="ol-popup-closer"> </a>-->
+    <div id="popup-content">
+      <div id="linker-handi" class="hide linker-contents">
+        <div class="row">
+          <div class="col-sm-5 col-md-5" id="handiCategory-Label">
+            Category:
+          </div>
+          <div class="col-sm-7 col-md-7" id="handi-poiCategory">
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-sm-5 col-md-5" id="handiCategoryDetail-Label">
+            Category Detail:
+          </div>
+          <div class="col-sm-7 col-md-7" id="handi-poiCategoryDetail">
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-sm-5 col-md-5" id="handiResource-Label">
+            Resource:
+          </div>
+          <div class="col-sm-7 col-md-7" id="handi-resource">
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-sm-5 col-md-5" id="handiEtc-Label">
+            Etc.:
+          </div>
+          <div class="col-sm-7 col-md-7" id="handi-etc">
+          </div>
+        </div>
+      </div>
+
+
+      <div id="linker-enter" class="hide linker-contents">
+        <div class="row">
+          <div class="col-sm-5 col-md-5" id="enterExitNum-Label">
+            Number:
+          </div>
+          <div class="col-sm-7 col-md-7" id="enter-exitNum">
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-sm-5 col-md-5" id="enterExitInfo-Label">
+            Info.:
+          </div>
+          <div class="col-sm-7 col-md-7" id="enter-exitInfo">
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-sm-5 col-md-5" id="enterConvenience-Label">
+            Convenience:
+          </div>
+          <div class="col-sm-7 col-md-7" id="enter-Convenience">
+          </div>
+        </div>
+      </div>
+
+      <div id="linker-shopping" class="hide linker-contents">
+        <div class="row">
+          <div class="col-sm-5 col-md-5" id="shopName-Label">
+            Name:
+          </div>
+          <div class="col-sm-7 col-md-7" id="shop-shopName">
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-sm-5 col-md-5" id="shopNumber-Label">
+            Number:
+          </div>
+          <div class="col-sm-7 col-md-7" id="shop-shopNumber">
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-sm-5 col-md-5" id="shopCategory-Label">
+            Category:
+          </div>
+          <div class="col-sm-7 col-md-7" id="shop-shopCategory">
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-sm-5 col-md-5" id="shopCategoryDetail-Label">
+            Category Detail:
+          </div>
+          <div class="col-sm-7 col-md-7" id="shop-shopCategoryDetail">
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-sm-5 col-md-5" id="shopTel-Label">
+            Telephone:
+          </div>
+          <div class="col-sm-7 col-md-7" id="shop-shopTel">
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-sm-5 col-md-5" id="shopHpAddress-Label">
+            Homepage:
+          </div>
+          <div class="col-sm-7 col-md-7" id="shop-shopHpAddress">
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-sm-5 col-md-5" id="shopNote-Label">
+            Note:
+          </div>
+          <div class="col-sm-7 col-md-7" id="shop-shopNote">
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+
+  <div id="nearbyPopup" class="nearby-popup hide">
+    <!--<a href="#" id="nearby-closer" class="ol-popup-closer"></a>-->
+    <h3>Nearby Information</h3>
+    <div id="nearby-content">
+      <div class="row">
+        <div class="col-sm-4 col-md-4" id="bldNameLabel">
+          Name:
+        </div>
+        <div class="col-sm-8 col-md-8" id="nearby-bldName">
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-sm-4 col-md-4" id="nearbyInfoLabel">
+          Info.:
+        </div>
+        <div class="col-sm-8 col-md-8" id="nearby-nearbyInfo">
+
+        </div>
+      </div>
+    </div>
+  </div>
+
 </body>
 <script>
   $(function(){
@@ -311,6 +453,15 @@
       var center = ol.proj.fromLonLat([ data['lon'], data['lat'] ]);
       map.getView().setZoom(17);
       map.getView().setCenter(center);
+
+
+      removeLayers(map, 'linker-');
+      $('input[name="linkerContent"]').each(function(){
+        this.checked = false;
+      });
+      $('#nearbyPopup').addClass('hide');
+      $('#nearbyPopup').removeClass('show');
+
 
       requestFloorData(data['bldId'], function(floorInfo){
         var radio = $('#layerRadio');
@@ -389,6 +540,15 @@
       });
     });
 
+    var container = document.getElementById('popup');
+    var overlay = new ol.Overlay({
+      element : container,
+      autoPan : true,
+      autoPanAnimation : {
+        duration : 250
+      }
+    });
+    map.addOverlay(overlay);
 
     $(document).on('change', 'input[name=floorObject]:checkbox', function(evt){
       var val = $(this).val();
@@ -400,18 +560,25 @@
     $(document).on('change', 'input[name=linkerContent]:checkbox', function(evt){
       var val = $(this).val();
       var checked = $(this).is(':checked');
+
+      overlay.setPosition(undefined);
       if (checked == true) {
         requestLinkerContentList(val, curData['bldId'], function (data) {
           if (val == 'nearby'){
-            console.log(data);
-            //bldName, nearbyInfo
-            // ko, jp, en
+            $('#nearbyPopup').removeClass('hide');
+            $('#nearbyPopup').addClass('show');
+
+            $('#nearby-bldName').text(data['bldName']['en']);
+            $('#nearby-nearbyInfo').text(data['nearbyInfo']['en']);
+
           } else {
             addPOIs(map, 'linker-' + val, data);
           }
         });
       } else {
         removePOIs(map, 'linker-' + val);
+        $('#nearbyPopup').addClass('hide');
+        $('#nearbyPopup').removeClass('show');
       }
 
     });
@@ -420,10 +587,49 @@
       var feature = map.forEachFeatureAtPixel(evt.pixel, function(feature, layer){
         return feature;
       });
-
+      var coordinate = evt.coordinate;
+      overlay.setPosition(undefined);
       if (typeof (feature) !== 'undefined'){
-        console.log(feature.get('info'));
+        var info = JSON.parse(feature.get('info'));
+        var title = feature.get('title');
+        $('.linker-contents').removeClass('show');
+        $('.linker-contents').addClass('hide');
+        $('#' + title).removeClass('hide');
+        $('#' + title).addClass('show');
+
+        try {
+          var type = title.split('-')[1];
+          requestLinkerContent(type, info['poiId'], function(data){
+            if (title == 'linker-handi') {
+              $('#handi-poiCategory').text(info['poiCategory']['en']);
+              $('#handi-poiCategoryDetail').text(info['poiCategoryDetail']['en']);
+              $('#handi-resource').text(JSON.parse(data['resource'])['en']);
+              $('#handi-etc').text(JSON.parse(data['etc'])['en']);
+            } else if (title == 'linker-enter') {
+              $('#enter-exitNum').text(data['exitNum']);
+              $('#enter-exitInfo').text(data['exitInfo']['en']);
+              $('#enter-Convenience').text(data['convenience']['en']);
+            } else if (title == 'linker-shopping') {
+              $('#shop-shopName').text(data['shopName']['en']);
+              $('#shop-shopNumber').text(data['shoppingNum']);
+              $('#shop-shopCategory').text(data['scCategory']['en']);
+              $('#shop-shopCategoryDetail').text(data['scCategoryDetail']['en']);
+              $('#shop-shopTel').text(data['tel']);
+              $('#shop-shopHpAddress').text(data['hpAddress']);
+              $('#shop-shopNumber').text(JSON.parse(data['note'])['en']);
+            }
+            // Noting - setting
+            // loading floor Data
+
+          });
+        }catch(e){
+          console.log(e);
+        }
+        overlay.setPosition(coordinate);
+
       }
+
+
     }
     map.on('click', mapEvt);
     map.on('pointermove', function(evt){
@@ -441,11 +647,7 @@
         }
       }
     });
+
   });
 </script>
-<script src="./js/main.js"></script>
-<script src="js/util.js"></script>
-<link rel="stylesheet" href="css/main.css" />
-<link rel="stylesheet" href="css/loading.css" />
-<link rel="stylesheet" href="css/navbar.css" />
 </html>

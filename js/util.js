@@ -98,6 +98,7 @@ function addPOIs(map, title, data){
       })
     });
     feature.setStyle(icon);
+    feature.set('title', title);
     feature.set('info', JSON.stringify(obj));
     array.push(feature);
   }
