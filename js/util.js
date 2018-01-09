@@ -123,3 +123,50 @@ function removePOIs(map, title){
   }
   return false;
 }
+
+function seoulMapInfo(map){
+  var baseUrl = 'http://map.seoul.go.kr/smgis/apps/mapsvr.do?key=51b32cf8444d4b6592a290bc64a88dc8';
+  var infoUrl = baseUrl + '&cmd=getMapInfo';
+  var proj_5179 = new ol.proj.Projection({ code : "EPSG:5179" });
+  $.ajax({
+    url : infoUrl,
+    type : 'get',
+    success : function(data){
+      var info = (typeof (data) !== 'undefined') ? data : null;
+      if (info == null){
+        return -1;
+      }
+      info = JSON.parse(info);
+      var enMap = info['tileMapInfos']['tileMapInfo'][16];
+
+      var tilegrid = new ol.tilegrid.TileGrid({
+        origin : [enMap['originX'], enMap['originY']],
+        extent : [enMap['mbr']['minx'], enMap['mbr']['miny'],
+          enMap['mbr']['maxx'], enMap['mbr']['maxy']],
+        resolutions : [128, 64, 32, 16, 8, 4, 2, 1, 0.5, 0.25],
+        tileSize : [enMap['imageSize'], enMap['imageSize']]
+      });
+      var xyz = new ol.source.XYZ({
+        crossOrigin : 'Anonymous',
+        projection : proj_5179,
+        tileUrlFunction : function(coordinate, pixelRatio, projection){
+          var z = coordinate[0];
+          var x = coordinate[1];
+          var y = coordinate[2];
+          var xHalf = parseInt(x/50);
+          var yHalf = parseInt(y/50); 
+          return enMap['url'] +
+                      z + '/' + xHalf + '/' + yHalf + '/' + x + '_' + y + '.png';
+        },
+        tileGrid : tilegrid
+      });
+
+      var bgLayer = getLayer(map, 'background-map');
+      bgLayer.setSource(xyz);
+
+    },
+    error : function(err){
+      console.log(err);
+    }
+  })
+}
